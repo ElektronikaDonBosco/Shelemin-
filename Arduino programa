@@ -1,0 +1,99 @@
+#include "Adafruit_VL53L0X.h"
+
+// address we will assign if dual sensor is present
+#define LOX1_ADDRESS 0x30
+#define LOX2_ADDRESS 0x31
+
+// set the pins to shutdown
+#define SHT_LOX1 7
+#define SHT_LOX2 6
+
+// objects for the vl53l0x
+Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
+Adafruit_VL53L0X lox2 = Adafruit_VL53L0X();
+
+// this holds the measurement
+VL53L0X_RangingMeasurementData_t distantzia1;
+VL53L0X_RangingMeasurementData_t distantzia2;
+
+
+void setID() {
+  
+  // all reset
+  digitalWrite(SHT_LOX1, LOW);    
+  digitalWrite(SHT_LOX2, LOW);
+  delay(10);
+  // all unreset
+  digitalWrite(SHT_LOX1, HIGH);
+  digitalWrite(SHT_LOX2, HIGH);
+  delay(10);
+
+  // activating LOX1 and reseting LOX2
+  digitalWrite(SHT_LOX1, HIGH);
+  digitalWrite(SHT_LOX2, LOW);
+
+  // initing LOX1
+  if(!lox1.begin(LOX1_ADDRESS)) {
+    Serial.println(F("Failed to boot first VL53L0X"));
+    while(1);
+  }
+  delay(10);
+
+  // activating LOX2
+  digitalWrite(SHT_LOX2, HIGH);
+  delay(10);
+
+  //initing LOX2
+  if(!lox2.begin(LOX2_ADDRESS)) {
+    while(1);
+  }
+}
+
+void read_dual_sensors() {
+  
+  lox1.rangingTest(&distantzia1, false); // pass in 'true' to get debug data printout!
+  lox2.rangingTest(&distantzia2, false); // pass in 'true' to get debug data printout!
+
+  if(distantzia1.RangeStatus != 4) {     // if not out of range
+  } else {
+  }
+
+  if(distantzia2.RangeStatus != 4) {
+  } else {
+  }
+
+}
+
+void setup() {
+
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+
+  pinMode(SHT_LOX1, OUTPUT);
+  pinMode(SHT_LOX2, OUTPUT);
+
+  digitalWrite(SHT_LOX1, LOW);
+  digitalWrite(SHT_LOX2, LOW);
+
+  setID();
+ 
+}
+
+void loop() {
+   
+  read_dual_sensors();
+    int x = map(distantzia1.RangeMilliMeter, 0, 500, 0, 255);
+    if ( x >= 255) {
+      x= 255;
+      }
+
+    int y = map(distantzia2.RangeMilliMeter, 0, 500, 0, 255);
+        if ( y >= 255) {
+      y= 255;
+      }
+
+    analogWrite (9,x);
+    analogWrite (10,y);
+
+  delay(100);
+}
