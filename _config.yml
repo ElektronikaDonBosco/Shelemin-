@@ -1,5 +1,0 @@
-plugins:
-  -jekyll-remote-theme
- remote_theme: chromatical/jekyll-materialdocs
-
-theme: jekyll-theme-minimal
