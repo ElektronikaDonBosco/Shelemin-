@@ -1,10 +1,10 @@
-#include <Audio.h>
+#include <Audio.h> //libreriak gehitzen ditugu programan
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
 #include <SerialFlash.h>
 
-// GUItool: begin automatically generated code
+//Lehendik sortutako audio sistema itsasten dugu
 AudioSynthWaveformSine   sine1;          //xy=362.53125762939453,122.03125476837158
 AudioSynthWaveform       waveform1;      //xy=364.03125762939453,163.03124713897705
 AudioMixer4              mixer1;         //xy=540.0312461853027,163.03124618530273
@@ -22,11 +22,9 @@ AudioConnection          patchCord6(delay2, 0, delay3, 0);
 AudioConnection          patchCord7(delay3, 0, delay4, 0);
 AudioConnection          patchCord8(delay4, 0, i2s1, 0);
 AudioControlSGTL5000     sgtl5000_1;     //xy=540.5312728881836,481.03126335144043
-// GUItool: end automatically generated code
 
 
 
-#include <Wire.h>
 #include "Adafruit_MPR121.h"
 
 #ifndef _BV
@@ -42,8 +40,8 @@ uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
 
 void setup() {
-  Serial.begin(9600);
-  AudioMemory(20);
+  Serial.begin(9600); //Serial hasten da programak ongi funzonatzen duela ziurtatu ahal izateko aurrerago
+  AudioMemory(20); // Sortutako audio sistemako elementuak inizializatzen dira bertan
   sgtl5000_1.enable();
   sgtl5000_1.volume(0.32);
   mixer1.gain(0, 1.0);
@@ -57,7 +55,7 @@ void setup() {
   delay3.delay(0, 0);  
   delay4.delay(0, 0);  
 
-  while (!Serial) { // needed to keep leonardo/micro from starting too fast!
+  while (!Serial) { 
     delay(10);
   }
   
@@ -74,31 +72,26 @@ void setup() {
 
 void loop() {
   
- int a = analogRead(A0);
+ int a = analogRead(A0); // Pin analogikoen bidez Arduinoko informazioa jasotzen eta irakurtzen da
  int b = analogRead(A1);
- //int aLog = pow (2, (a /(10)+15)/10+3.4);
- int x = map (a, 0, 573, 10, 1000);
-
+ 
+ int x = map (a, 0, 573, 10, 1000); //map batzuen bidez balioak doitzen dira
  float y = map (b, 0.0, 572.8, 0.0, 500.0);
  float b2 = y/1000;
 
- sine1.frequency(x);
+ sine1.frequency(x); //Audio sistemako elementuetan sartzen dira balioak, frekuentzia eta bolumena egoki ditzan
  sine1.amplitude(b2);
 
  waveform1.frequency(x);
  waveform1.amplitude(b2);
 
 
-
- 
-  // Get the currently touched pads
-  currtouched = cap.touched();
   
   for (uint8_t i=0; i<12; i++) {
-    // it if *is* touched and *wasnt* touched before, alert!
+  
     if ((currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) {
       Serial.print(i); Serial.println(" ukitua");
-      if(i==1){
+      if(i==1){ //ondorengo lerroetan efektuak asignatzen zaizkie MPR121 sentsorearen pad-ei
         mixer1.gain(0, 0.0);
         mixer1.gain(1, 1.0);
         mixer1.gain(2, 0.0);
@@ -181,16 +174,13 @@ void loop() {
       }
     }
     
-    // if it *was* touched and now *isnt*, alert!
     if (!(currtouched & _BV(i)) && (lasttouched & _BV(i)) ) {
       Serial.print(i); Serial.println(" askatua");
     }
   }
 
-  // reset our state
   lasttouched = currtouched;
 
-  // comment out this line for detailed data from the sensor!
   return;
   
   // debugging info, what
@@ -206,6 +196,6 @@ void loop() {
   }
   Serial.println();
   
-  // put a delay so it isn't overwhelming
+  // delay bat jartzen da, gehiegizko informazioaren ondorioz programa atzeratu ez dadin
   delay(100);
 }
